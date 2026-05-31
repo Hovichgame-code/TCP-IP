@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TCP/IP Tower Defense</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="brand" id="homeBtn" type="button" aria-label="Ekran startowy">
+          <span class="brand-mark">IP</span>
+          <span>
+            <strong>TCP/IP Tower Defense</strong>
+            <small>Kolorowa obrona Internetu</small>
+          </span>
+        </button>
+        <nav class="nav-tabs" aria-label="Główne widoki">
+          <button class="tab is-active" data-view="intro" type="button">Model</button>
+          <button class="tab" data-view="game" type="button">Gra</button>
+          <button class="tab" data-view="training" type="button">Trening</button>
+          <button class="tab" data-view="glossary" type="button">Słownik</button>
+          <button class="tab" data-view="ports" type="button">Porty</button>
+          <button class="tab" data-view="notes" type="button">Notatka</button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="view is-active intro-view" id="intro" aria-labelledby="introTitle">
+          <div class="intro-hero">
+            <div class="hero-copy">
+              <p class="eyebrow">Gra edukacyjna 2D</p>
+              <h1 id="introTitle">Obroń Internet przed Wielką Awarią Sieci</h1>
+              <p>
+                Buduj wieże-protokoły, odpieraj fale błędów i po każdej rundzie
+                rozwiązuj krótkie quizy o modelu TCP/IP.
+              </p>
+              <div class="hero-actions">
+                <button class="primary-action" id="startGameBtn" type="button">Rozpocznij kampanię</button>
+                <button class="secondary-action" id="openGlossaryBtn" type="button">Otwórz słownik</button>
+              </div>
+            </div>
+            <div class="packet-lab" aria-label="Animacja warstw TCP/IP">
+              <div class="packet">DATA</div>
+              <div class="layer-stack">
+                <button class="layer-card" data-layer="application" type="button">
+                  <span>Application Layer</span>
+                  <strong>Warstwa aplikacji</strong>
+                </button>
+                <button class="layer-card" data-layer="transport" type="button">
+                  <span>Transport Layer</span>
+                  <strong>Warstwa transportowa</strong>
+                </button>
+                <button class="layer-card" data-layer="internet" type="button">
+                  <span>Internet Layer</span>
+                  <strong>Warstwa internetu</strong>
+                </button>
+                <button class="layer-card" data-layer="access" type="button">
+                  <span>Network Access Layer</span>
+                  <strong>Warstwa dostępu do sieci</strong>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <article class="info-panel" id="layerDetails">
+              <h2>Model TCP/IP</h2>
+              <p>
+                Model TCP/IP składa się z 4 warstw. Każda warstwa realizuje
+                określone zadania i współpracuje z pozostałymi podczas przesyłania
+                danych przez sieć.
+              </p>
+              <p class="hint-text">Kliknij warstwę po prawej, aby zobaczyć jej protokoły i rolę w grze.</p>
+            </article>
+            <article class="info-panel">
+              <h2>Kolejność warstw</h2>
+              <ol class="layer-order">
+                <li>Application Layer <span>Warstwa aplikacji</span></li>
+                <li>Transport Layer <span>Warstwa transportowa</span></li>
+                <li>Internet Layer <span>Warstwa internetu</span></li>
+                <li>Network Access Layer <span>Warstwa dostępu do sieci</span></li>
+              </ol>
+            </article>
+          </div>
+        </section>
+
+        <section class="view game-view" id="game" aria-label="Plansza gry">
+          <div class="game-layout">
+            <aside class="side-panel">
+              <div class="status-strip">
+                <span>Świat <strong id="worldNumber">1</strong>/4</span>
+                <span>Fala <strong id="waveNumber">1</strong></span>
+                <span>Energia <strong id="energyAmount">120</strong></span>
+                <span>Życie <strong id="baseHealth">20</strong></span>
+              </div>
+
+              <div class="world-card">
+                <p class="eyebrow" id="worldLabel">Warstwa dostępu do sieci</p>
+                <h2 id="worldTitle">Network Access Layer</h2>
+                <p id="worldDescription">
+                  Kontroluje urządzenia fizyczne i przesyłanie ramek danych w sieci lokalnej.
+                </p>
+              </div>
+
+              <div class="map-picker">
+                <label for="mapSelect">Mapa poziomu (auto)</label>
+                <select id="mapSelect"></select>
+                <p class="hint-text" id="mapDescription">Mapa zmienia się automatycznie po każdej fali.</p>
+              </div>
+
+              <div>
+                <div class="section-title">
+                  <h3>Wieże protokołów</h3>
+                  <button class="icon-action" id="clearSelectionBtn" type="button" title="Wyczyść wybór">×</button>
+                </div>
+                <div class="tower-list" id="towerList"></div>
+              </div>
+
+              <div class="actions-row">
+                <button class="primary-action" id="startWaveBtn" type="button">Start fali</button>
+                <button class="secondary-action" id="resetGameBtn" type="button">Reset</button>
+              </div>
+              <p class="hint-text" id="gameHint">
+                Wybierz wieżę i kliknij wolne pole. Kliknij postawioną wieżę, aby ją ulepszyć albo sprzedać.
+              </p>
+            </aside>
+
+            <section class="arena-wrap">
+              <canvas id="gameCanvas" width="1024" height="640" aria-label="Mapa tower defense"></canvas>
+              <div class="mobile-pad">
+                <button class="secondary-action" id="mobileWaveBtn" type="button">Start fali</button>
+                <button class="secondary-action" id="mobileQuizBtn" type="button">Quiz</button>
+              </div>
+            </section>
+
+            <aside class="side-panel log-panel">
+              <div class="section-title">
+                <h3>Cyber-dziennik</h3>
+                <span class="mini-badge" id="bossBadge">Boss zamknięty</span>
+              </div>
+              <div class="log-feed" id="logFeed" aria-live="polite"></div>
+              <div class="selected-card" id="selectedInfo">
+                <h3>Wybierz protokół</h3>
+                <p>Tu pojawi się pełna nazwa, tłumaczenie, port i efekt w grze.</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view glossary-view" id="glossary" aria-labelledby="glossaryTitle">
+          <div class="library-header">
+            <div>
+              <p class="eyebrow">Słownik i bohaterowie</p>
+              <h1 id="glossaryTitle">Protokoły, pojęcia i role w grze</h1>
+            </div>
+            <input id="searchInput" type="search" placeholder="Szukaj: DNS, VLAN, port 443..." />
+          </div>
+          <div class="cards-grid" id="glossaryGrid"></div>
+        </section>
+
+        <section class="view training-view" id="training" aria-labelledby="trainingTitle">
+          <div class="training-layout">
+            <aside class="lesson-rail">
+              <p class="eyebrow">Trening TCP/IP</p>
+              <h1 id="trainingTitle">Ścieżka wiedzy</h1>
+              <div class="training-stats">
+                <span>XP <strong id="trainingXp">0</strong></span>
+                <span>Serca <strong id="trainingHearts">5</strong></span>
+                <span>Seria <strong id="trainingStreak">0</strong></span>
+              </div>
+              <div class="lesson-list" id="lessonList"></div>
+            </aside>
+            <section class="lesson-stage">
+              <div class="lesson-card" id="lessonCard">
+                <p class="eyebrow" id="lessonLabel">Lekcja 1</p>
+                <h2 id="lessonTitle">Model TCP/IP</h2>
+                <p id="lessonPrompt">Wybierz lekcję, a potem odpowiedz na krótkie pytania.</p>
+                <div class="answers lesson-answers" id="lessonAnswers"></div>
+                <p class="quiz-feedback" id="lessonFeedback"></p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view ports-view" id="ports" aria-labelledby="portsTitle">
+          <div class="library-header">
+            <div>
+              <p class="eyebrow">Najważniejsze porty</p>
+              <h1 id="portsTitle">Porty, które warto znać</h1>
+            </div>
+            <button class="primary-action" id="practicePortsBtn" type="button">Ćwicz porty w quizie</button>
+          </div>
+          <div class="ports-table" id="portsTable"></div>
+        </section>
+
+        <section class="view notes-view" id="notes" aria-labelledby="notesTitle">
+          <div class="library-header">
+            <div>
+              <p class="eyebrow">Notatka z pliku</p>
+              <h1 id="notesTitle">Model TCP/IP - skrót do nauki</h1>
+            </div>
+            <button class="primary-action" id="notesTrainingBtn" type="button">Ucz się z tej notatki</button>
+          </div>
+          <div class="note-grid">
+            <article class="note-panel">
+              <h2>Warstwy TCP/IP</h2>
+              <p>Model TCP/IP składa się z 4 warstw. Każda warstwa realizuje określone zadania i współpracuje z pozostałymi podczas przesyłania danych przez sieć.</p>
+              <ol class="layer-order">
+                <li>Application Layer <span>Warstwa aplikacji - DNS, HTTP, HTTPS, SMTP, POP3, IMAP, FTP, SFTP, TFTP, REST</span></li>
+                <li>Transport Layer <span>Warstwa transportowa - TCP i UDP, porty, segmenty, kontrola błędów</span></li>
+                <li>Internet Layer <span>Warstwa internetu - IP, IPv4, IPv6, NAT, ICMP, OSPF, EIGRP, BGP</span></li>
+                <li>Network Access Layer <span>Warstwa dostępu do sieci - ARP, Ethernet, VLAN, MAC, Frame, Switch, NIC</span></li>
+              </ol>
+            </article>
+            <article class="note-panel">
+              <h2>TCP kontra UDP</h2>
+              <p><strong>TCP</strong> jest połączeniowy, niezawodny, potwierdza odbiór danych, kontroluje błędy i zachowuje kolejność pakietów.</p>
+              <p><strong>UDP</strong> jest bezpołączeniowy, bardzo szybki, ma małe opóźnienia i nie gwarantuje dostarczenia pakietów.</p>
+            </article>
+            <article class="note-panel">
+              <h2>Najważniejsze porty</h2>
+              <div class="mini-port-grid">
+                <span>DNS</span><strong>53 TCP/UDP</strong>
+                <span>DHCPv4</span><strong>67, 68 UDP</strong>
+                <span>SMTP</span><strong>25 TCP</strong>
+                <span>POP3</span><strong>110 TCP</strong>
+                <span>IMAP</span><strong>143 TCP</strong>
+                <span>FTP</span><strong>20, 21 TCP</strong>
+                <span>SFTP</span><strong>22 TCP</strong>
+                <span>TFTP</span><strong>69 UDP</strong>
+                <span>HTTP</span><strong>80 TCP</strong>
+                <span>HTTPS</span><strong>443 TCP</strong>
+                <span>BGP</span><strong>179 TCP</strong>
+              </div>
+            </article>
+            <article class="note-panel">
+              <h2>Najkrótsze skojarzenia</h2>
+              <p><strong>ARP:</strong> IPv4 na MAC.</p>
+              <p><strong>DNS:</strong> domena na IP.</p>
+              <p><strong>Routing:</strong> wybór trasy pakietu.</p>
+              <p><strong>VLAN:</strong> logiczny podział jednej sieci fizycznej.</p>
+              <p><strong>Frame:</strong> ramka w warstwie dostępu do sieci.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal" id="quizModal" hidden>
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="quizTitle">
+        <p class="eyebrow" id="quizType">Mini-quiz</p>
+        <h2 id="quizTitle">Pytanie</h2>
+        <div class="answers" id="answers"></div>
+        <p class="quiz-feedback" id="quizFeedback"></p>
+      </div>
+    </div>
+
+    <div class="modal" id="summaryModal" hidden>
+      <div class="modal-panel summary-panel" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
+        <p class="eyebrow">Koniec kampanii</p>
+        <h2 id="summaryTitle">Internet obroniony</h2>
+        <div id="summaryContent"></div>
+        <button class="primary-action" id="closeSummaryBtn" type="button">Zagraj ponownie</button>
+      </div>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>
